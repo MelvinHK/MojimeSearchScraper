@@ -5,9 +5,9 @@ import { BASE_URL } from "../config.js";
 import "./types.js";
 
 /**
- * Scrapes and returns an anime page's details.
+ * Scrapes and returns an anime's page details.
  * 
- * @param {string} animeId - The ID of an anime show.
+ * @param {string} animeId - The ID of an anime.
  * @returns {Promise<AnimeDetails>} - A promise of the anime's details.
  */
 export const scrapeAnimeDetails = async (animeId) => {
@@ -44,7 +44,7 @@ export const scrapeAnimeDetails = async (animeId) => {
 };
 
 /**
- * Fetches the an episode ID's corresponding anime ID.
+ * Fetches the episode ID's corresponding anime ID.
  * 
  * @param {string} episodeId - The ID of an episode.
  * @returns {Promise<string>} - A promise of the corresponding anime ID.
