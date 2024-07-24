@@ -1,27 +1,29 @@
 import axios from "axios";
 import { load } from "cheerio";
-import config from "../config.js";
-import { scrapeAnimeDetails } from "./helpers.js";
 
-const BASE_URL = config.BASE_URL;
+import { scrapeAnimeDetails } from "./helpers.js";
+import { BASE_URL } from "../config.js";
+import "./types.js";
 
 /**
- * Recursively scrapes all anime list's pages for all anime details, 
- * performing a callback once the number of anime details exceeds a batch limit.
+ * @fileoverview This file contains functions for scraping the entirety of GoGoAnime's anime-list pages.
+ */
+
+/**
+ * Recursively scrapes all anime list pages for all anime details.
  * 
  * @param {number} page The page number to start on.
- * @param {number} batchSize The maximum number of anime details scraped before performing callback.
- * @param {function(Array): void} [callBack] Callback once batch number is exceeded.
- * 
- * @returns 
+ * @param {function(AnimeDetails[]): void} callback
+ * @param {AnimeDetails[]} animeList
+ * @returns {Promise<AnimeDetails[]>}
  */
-const scrapePage = async (page, batchSize, callBack = async (animeListBatch) => { }) => {
-  const url = `${BASE_URL}/anime-list.html?page=${page}`;
+const scrapePage = async (page, callback = (batch) => { }, animeList = []) => {
+  const response = await axios.get(`${BASE_URL}/anime-list.html?page=${page}`);
+  const $ = load(response.data);
 
-  const html = await axios.get(url);
-  const $ = load(html.data);
-
-  const hasNextPage = $("div.anime_name.anime_list > div > div > ul > li.selected").next().length > 0;
+  const hasNextPage = $("div.anime_name.anime_list > div > div > ul > li.selected")
+    .next()
+    .length > 0;
 
   const animeList = await Promise.all(
     $("section.content_left > div > div.anime_list_body > ul")
@@ -36,16 +38,15 @@ const scrapePage = async (page, batchSize, callBack = async (animeListBatch) => 
   );
 
   if (hasNextPage) {
-    const nextPageList = await scrapePage(page + 1, batchSize);
-    return animeList.concat(nextPageList);
+
   }
 
   return animeList;
 };
 
 (async () => {
-  const list = await scrapePage(1, 40, async (animeListBatch) => {
-    console.log('Batch: ', animeListBatch.length);
+  const list = await scrapePage(1, (batch) => {
+    console.log("Batch processed:", batch.length, "items");
   });
-  console.log(list.length);
+  console.log(list);
 })();

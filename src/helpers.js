@@ -1,14 +1,14 @@
 import axios from "axios";
 import { load } from "cheerio";
-import config from "../config.js";
 
-const BASE_URL = config.BASE_URL;
+import { BASE_URL } from "../config.js";
+import "./types.js";
 
 /**
  * Scrapes and returns an anime page's details.
  * 
  * @param {string} animeId The ID of an anime show.
- * @returns A promise of the anime's details as an object.
+ * @returns {Promise<AnimeDetails>} A promise of the anime's details.
  */
 export const scrapeAnimeDetails = async (animeId) => {
   try {
