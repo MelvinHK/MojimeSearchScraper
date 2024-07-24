@@ -15,7 +15,7 @@ import "./types.js";
  * @param {number} page - The page number to start on.
  * @param {number} BATCH_THRESHOLD - The batch size limit.
  * @param {function(AnimeDetails[]): void} callback - Callback once BATCH_THRESHOLD is exceeded.
- * @param {AnimeDetails[]} [scrapedList=[]] - (Used internally for recursion) The currently collected items.
+ * @param {AnimeDetails[]} [scrapedList=[]] - The currently collected items during recursion. Leave as default.
  * @returns {Promise<AnimeDetails[]>}
  */
 const scrapePage = async (page, BATCH_THRESHOLD, callback, scrapedList = []) => {

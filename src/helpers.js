@@ -8,7 +8,7 @@ import "./types.js";
  * Scrapes and returns an anime's page details.
  * 
  * @param {string} animeId - The ID of an anime.
- * @returns {Promise<AnimeDetails>} - A promise of the anime's details.
+ * @returns {Promise<AnimeDetails>} A promise of the anime's details.
  */
 export const scrapeAnimeDetails = async (animeId) => {
   try {
@@ -47,7 +47,7 @@ export const scrapeAnimeDetails = async (animeId) => {
  * Fetches the episode ID's corresponding anime ID.
  * 
  * @param {string} episodeId - The ID of an episode.
- * @returns {Promise<string>} - A promise of the corresponding anime ID.
+ * @returns {Promise<string>} A promise of the corresponding anime ID.
  * 
  * @example
  * async () => {
@@ -74,7 +74,7 @@ export const fetchAnimeIdFromEpisodeId = async (episodeId) => {
  * Gets the last section of a URL separated by '/'.
  * 
  * @param {string} url - The URL to process.
- * @returns {string} - The last section of the URL.
+ * @returns {string} The last section of the URL.
  * 
  * @example
  * getLastUrlSection('https://anitaku.pe/naruto-episode-1');
