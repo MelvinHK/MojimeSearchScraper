@@ -5,9 +5,48 @@ import config from "../config.js";
 const BASE_URL = config.BASE_URL;
 
 /**
- * Fetches the corresponding anime ID given an episode ID.
+ * Scrapes and returns an anime page's details.
  * 
- * @param {string} episodeId The ID of an episode, with the base url included or not.
+ * @param {string} animeId The ID of an anime show.
+ * @returns A promise of the anime's details as an object.
+ */
+export const scrapeAnimeDetails = async (animeId) => {
+  try {
+    checkTypeError(animeId, 'string');
+
+    const animeDetailsPage = await axios.get(`${BASE_URL}/category/${animeId}`);
+
+    const $ = load(animeDetailsPage.data);
+
+    const title = $('div.anime_info_body_bg > h1')
+      .text()
+      .trim();
+
+    const otherNames = $('div.anime_info_body_bg > p.type.other-name')
+      .find('a')
+      .map((_index, element) => {
+        const name = $(element).text().trim();
+        if (name) return name;
+      })
+      .get();
+
+    const subOrDub = title.includes('(Dub)') ? 'dub' : 'sub';
+
+    return {
+      id: animeId,
+      title: title,
+      subOrDub: subOrDub,
+      otherNames: otherNames,
+    };
+  } catch (error) {
+    throw error;
+  }
+};
+
+/**
+ * Fetches the an episode ID's corresponding anime ID.
+ * 
+ * @param {string} episodeId The ID of an episode.
  * @returns {Promise<string>} A promise of the corresponding anime ID.
  * 
  * @example
@@ -46,7 +85,7 @@ export const getLastUrlSection = (url) => {
 
   const sections = url.split('/');
   return sections[sections.length - 1] || sections[sections.length - 2]; // - 2 In case url ends with '/'.
-}
+};
 
 /**
  * @throws {TypeError}
