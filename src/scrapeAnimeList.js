@@ -12,10 +12,10 @@ import "./types.js";
 /**
  * Recursively scrapes all anime list pages for all anime details.
  * 
- * @param {number} page The page number to start on.
- * @param {number} BATCH_THRESHOLD The batch size limit.
- * @param {function(AnimeDetails[]): void} callback Callback once BATCH_THRESHOLD is exceeded.
- * @param {AnimeDetails[]} [scrapedList=[]] (Used internally for recursion) The currently collected items.
+ * @param {number} page - The page number to start on.
+ * @param {number} BATCH_THRESHOLD - The batch size limit.
+ * @param {function(AnimeDetails[]): void} callback - Callback once BATCH_THRESHOLD is exceeded.
+ * @param {AnimeDetails[]} [scrapedList=[]] - (Used internally for recursion) The currently collected items.
  * @returns {Promise<AnimeDetails[]>}
  */
 const scrapePage = async (page, BATCH_THRESHOLD, callback, scrapedList = []) => {
