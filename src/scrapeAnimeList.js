@@ -2,7 +2,7 @@ import axios from "axios";
 import { load } from "cheerio";
 
 import { scrapeAnimeDetails, getLastUrlSection } from "./helpers.js";
-import { BASE_URL } from "../config.js";
+import { BASE_URL } from "./config.js";
 import "./types.js";
 
 /**
@@ -18,7 +18,7 @@ import "./types.js";
  * @param {AnimeDetails[]} currentBatch - The currently collected items during recursion. Leave as default.
  * @returns {Promise<AnimeDetails[]>}
  */
-const scrapePage = async (page, BATCH_THRESHOLD, callback, currentBatch = []) => {
+export const scrapePage = async (page, BATCH_THRESHOLD, callback, currentBatch = []) => {
   try {
     const response = await axios.get(`${BASE_URL}/anime-list.html?page=${page}`);
     const $ = load(response.data);

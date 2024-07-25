@@ -1,7 +1,7 @@
 import axios from "axios";
 import { load } from "cheerio";
 
-import { BASE_URL } from "../config.js";
+import { BASE_URL } from "./config.js";
 import "./types.js";
 
 /**
