@@ -1,19 +1,37 @@
 import { scrapePage } from "./scrapeAnimeList.js";
 
-let totalProcessed = 0;
-
 const main = async () => {
-  console.log("Starting full anime list scrape...");
+  const startTime = performance.now();
+  console.log("Starting full anime-list scrape...");
 
   await scrapePage((batch) => {
-    console.log(
-      'Batch processed:\nFirst item:',
-      batch[0],
-      '\nLast item:',
-      batch[batch.length - 1]
-    );
-    console.log("Total processed:", totalProcessed += batch.length);
-  }, 500);
+    logProgress(batch);
+  }, 50);
+
+  const endTime = performance.now();
+  console.log(`Scrape completed. Duration (hh:mm:ss): ${formatTimestamp(endTime - startTime)}`);
+};
+
+const logProgress = (batch) => {
+  let totalProcessed = 0;
+  let batchNo = 1;
+
+  console.log(
+    `Batch ${batchNo++} processed:`,
+    '\nFirst item:', batch[0],
+    '\nLast item:', batch[batch.length - 1],
+    "\nTotal processed:", totalProcessed += batch.length,
+    "\n"
+  );
+};
+
+const formatTimestamp = (elapsedMs) => {
+  const seconds = Math.floor(elapsedMs / 1000);
+  const hours = String(Math.floor(seconds / 3600)).padStart(2, '0');
+  const minutes = String(Math.floor((seconds % 3600) / 60)).padStart(2, '0');
+  const secs = String(seconds % 60).padStart(2, '0');
+
+  return `${hours}:${minutes}:${secs}`;
 };
 
 main();
