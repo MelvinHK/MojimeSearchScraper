@@ -6,17 +6,21 @@ import { BASE_URL } from "./config.js";
 import "./types.js";
 
 /**
- * @fileoverview This file contains functions for scraping the entirety of GoGoAnime's anime-list pages.
- */
-
-/**
- * Recursively scrapes all anime list pages for all anime details.
+ * Recursively scrapes all anime list pages for all anime details. 
+ * After a specified batch-size threshold is exceeded, a callback may be performed with the batch.
  * 
  * @param {number} page - The page number to start on.
- * @param {number} BATCH_THRESHOLD - The batch size limit.
+ * @param {number} BATCH_THRESHOLD
  * @param {function(AnimeDetails[]): void} callback - Callback once BATCH_THRESHOLD is exceeded.
  * @param {AnimeDetails[]} currentBatch - The currently collected items during recursion. Leave as default.
  * @returns {Promise<AnimeDetails[]>}
+ * 
+ * @example
+ * async () => {
+ *   await scrapePage(1, 100, (batch) => { 
+ *     // Do something after 100 in batch. 
+ *   });
+ * }
  */
 export const scrapePage = async (page, BATCH_THRESHOLD, callback, currentBatch = []) => {
   try {
