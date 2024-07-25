@@ -47,12 +47,13 @@ const scrapePage = async (page, BATCH_THRESHOLD, callback, scrapedList = []) => 
 
   if (hasNextPage) {
     return scrapePage(page + 1, BATCH_THRESHOLD, callback, scrapedList);
-  } else {
-    if (scrapedList.length > 0) { // Handle remaining items on last page.
-      callback(scrapedList);
-    }
-    return scrapedList;
   }
+
+  if (scrapedList.length > 0) { // Handle remaining items on last page.
+    callback(scrapedList);
+  }
+  
+  return scrapedList;
 };
 
 (async () => {
