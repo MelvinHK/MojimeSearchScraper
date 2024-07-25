@@ -9,20 +9,20 @@ import "./types.js";
  * Recursively scrapes all anime list pages for all anime details. 
  * After a specified batch-size threshold is exceeded, a callback may be performed with the batch.
  * 
- * @param {number} page - The page number to start on.
- * @param {number} BATCH_THRESHOLD
  * @param {function(AnimeDetails[]): void} callback - Callback once BATCH_THRESHOLD is exceeded.
+ * @param {number} BATCH_THRESHOLD - Threshold for the number of items per batch.
+ * @param {number} page - The page number to start on. Defaults to 1. 
  * @param {AnimeDetails[]} currentBatch - The currently collected items during recursion. Leave as default.
  * @returns {Promise<AnimeDetails[]>}
  * 
  * @example
  * async () => {
- *   await scrapePage(1, 100, (batch) => { 
+ *   await scrapePage((batch) => { 
  *     // Do something after 100 in batch. 
- *   });
+ *   }, 100);
  * }
  */
-export const scrapePage = async (page, BATCH_THRESHOLD, callback, currentBatch = []) => {
+export const scrapePage = async (callback, BATCH_THRESHOLD, page = 1, currentBatch = []) => {
   try {
     const response = await axios.get(`${BASE_URL}/anime-list.html?page=${page}`);
     const $ = load(response.data);
@@ -50,7 +50,7 @@ export const scrapePage = async (page, BATCH_THRESHOLD, callback, currentBatch =
     }
 
     if (hasNextPage) {
-      return scrapePage(page + 1, BATCH_THRESHOLD, callback, currentBatch);
+      return scrapePage(callback, BATCH_THRESHOLD, page + 1, currentBatch);
     }
 
     if (currentBatch.length > 0) { // Handle remaining items on last page.
