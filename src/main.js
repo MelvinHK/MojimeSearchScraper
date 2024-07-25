@@ -1,21 +1,22 @@
 import { scrapePage } from "./scrapeAnimeList.js";
 
+let totalProcessed = 0;
+let batchNo = 1;
+
 const main = async () => {
+
   const startTime = performance.now();
   console.log("Starting full anime-list scrape...");
 
   await scrapePage((batch) => {
     logProgress(batch);
-  }, 50);
+  }, 500);
 
   const endTime = performance.now();
   console.log(`Scrape completed. Duration (hh:mm:ss): ${formatTimestamp(endTime - startTime)}`);
 };
 
 const logProgress = (batch) => {
-  let totalProcessed = 0;
-  let batchNo = 1;
-
   console.log(
     `Batch ${batchNo++} processed:`,
     '\nFirst item:', batch[0],

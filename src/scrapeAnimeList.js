@@ -1,9 +1,12 @@
 import axios from "axios";
 import { load } from "cheerio";
+import pLimit from "p-limit";
 
 import { scrapeAnimeDetails, getLastUrlSection } from "./helpers.js";
 import { BASE_URL } from "./config.js";
 import "./types.js";
+
+const limit = pLimit(10);
 
 /**
  * Recursively scrapes all anime list pages for all anime details. 
@@ -34,10 +37,10 @@ export const scrapePage = async (callback, BATCH_THRESHOLD, page = 1, currentBat
     const currentPageItems = await Promise.all(
       $("section.content_left > div > div.anime_list_body > ul")
         .children()
-        .map(async (_index, anime) => {
+        .map((_index, anime) => {
           const animeUrl = $(anime).find("a").attr("href");
           const animeId = getLastUrlSection(animeUrl); // Will throw TypeError if animeUrl is undefined.
-          return await scrapeAnimeDetails(animeId);
+          return limit(() => scrapeAnimeDetails(animeId));
         })
         .get()
     );
