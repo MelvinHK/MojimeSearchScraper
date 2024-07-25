@@ -92,6 +92,6 @@ export const getLastUrlSection = (url) => {
  */
 const checkTypeError = (checkedParam, type) => {
   if (typeof checkedParam !== type) {
-    throw new TypeError(`The episodeId parameter must be of type ${type}.`);
+    throw new TypeError(`The ${checkedParam} parameter must be of type ${type}.`);
   }
 };
