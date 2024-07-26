@@ -1,7 +1,6 @@
-import axios from "axios";
 import { load } from "cheerio";
 
-import { BASE_URL } from "./config.js";
+import { BASE_URL, axiosInstance } from "./config.js";
 import "./types.js";
 
 /**
@@ -14,7 +13,7 @@ export const scrapeAnimeDetails = async (animeId) => {
   try {
     checkTypeError(animeId, 'string');
 
-    const animeDetailsPage = await axios.get(`${BASE_URL}/category/${animeId}`);
+    const animeDetailsPage = await axiosInstance.get(`${BASE_URL}/category/${animeId}`);
 
     const $ = load(animeDetailsPage.data);
 
@@ -59,12 +58,14 @@ export const fetchAnimeIdFromEpisodeId = async (episodeId) => {
   try {
     checkTypeError(episodeId, 'string');
 
-    const res = await axios.get(`${BASE_URL}/${episodeId}`);
+    const res = await axiosInstance.get(`${BASE_URL}/${episodeId}`);
     const $ = load(res.data);
 
-    return $('#wrapper_bg > section > section.content_left > div:nth-child(1) > div.anime_video_body > div.anime_video_body_cate > div.anime-info > a')
-      .attr('href')
-      .split('/')[2];
+    const animeUrl = $(
+      '#wrapper_bg > section > section.content_left > div:nth-child(1) > div.anime_video_body > div.anime_video_body_cate > div.anime-info > a'
+    ).attr('href');
+
+    return getLastUrlSection(animeUrl);
   } catch (error) {
     throw error;
   }

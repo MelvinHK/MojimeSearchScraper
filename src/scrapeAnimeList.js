@@ -1,12 +1,14 @@
-import axios from "axios";
 import { load } from "cheerio";
-import pLimit from "p-limit";
 
 import { scrapeAnimeDetails, getLastUrlSection } from "./helpers.js";
-import { BASE_URL } from "./config.js";
+import { BASE_URL, limit, axiosInstance } from "./config.js";
 import "./types.js";
 
-const limit = pLimit(10);
+/**
+ * @overview Scrapes GoGoAnime's entire anime-list. 
+ * Duration depends on concurrency limit set in "./config.js".
+ * Intended to run locally via `npm start`.
+ */
 
 /**
  * Recursively scrapes all anime list pages for all anime details. 
@@ -27,7 +29,7 @@ const limit = pLimit(10);
  */
 export const scrapePage = async (callback, BATCH_THRESHOLD, page = 1, currentBatch = []) => {
   try {
-    const response = await axios.get(`${BASE_URL}/anime-list.html?page=${page}`);
+    const response = await axiosInstance.get(`${BASE_URL}/anime-list.html?page=${page}`);
     const $ = load(response.data);
 
     const hasNextPage = $("div.anime_name.anime_list > div > div > ul > li.selected")

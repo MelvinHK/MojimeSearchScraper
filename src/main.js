@@ -4,7 +4,6 @@ let totalProcessed = 0;
 let batchNo = 1;
 
 const main = async () => {
-
   const startTime = performance.now();
   console.log("Starting full anime-list scrape...");
 
