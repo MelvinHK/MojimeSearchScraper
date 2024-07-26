@@ -7,21 +7,24 @@ const main = async () => {
   const startTime = performance.now();
   console.log("Starting full anime-list scrape...");
 
-  await scrapePage((batch) => {
-    logProgress(batch);
+  await scrapePage(async (batch) => {
+    console.log("\nBatch size reached, processing...");
+    
+    // Insert to MongoDB
+    
+    logBatch(batch);
   }, 500);
 
   const endTime = performance.now();
-  console.log(`Scrape completed. Duration (hh:mm:ss): ${formatTimestamp(endTime - startTime)}`);
+  console.log(`\nScrape completed. Duration (hh:mm:ss): ${formatTimestamp(endTime - startTime)}`);
 };
 
-const logProgress = (batch) => {
+const logBatch = (batch) => {
   console.log(
-    `Batch ${batchNo++} processed:`,
+    `\nBatch ${batchNo++} processed:`,
     '\nFirst item:', batch[0],
     '\nLast item:', batch[batch.length - 1],
-    "\nTotal processed:", totalProcessed += batch.length,
-    "\n"
+    "\nTotal processed:", totalProcessed += batch.length
   );
 };
 

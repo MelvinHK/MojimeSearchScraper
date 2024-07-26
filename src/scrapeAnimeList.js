@@ -14,9 +14,9 @@ import "./types.js";
  * Recursively scrapes all anime list pages for all anime details. 
  * After a specified batch-size threshold is exceeded, a callback may be performed with the batch.
  * 
- * @param {function(AnimeDetails[]): void} callback - Callback once BATCH_THRESHOLD is exceeded.
- * @param {number} BATCH_THRESHOLD - Threshold for the number of items per batch.
- * @param {number} page - The page number to start on. Defaults to 1. 
+ * @param {function(AnimeDetails[]): Promise | void} callback - Callback once BATCH_SIZE is reached.
+ * @param {number} BATCH_SIZE - Threshold for the number of items per batch.
+ * @param {number} pageNumber - The page number to start on. Defaults to 1. 
  * @param {AnimeDetails[]} currentBatch - The currently collected items during recursion. Leave as default.
  * @returns {Promise<AnimeDetails[]>}
  * 
@@ -27,9 +27,11 @@ import "./types.js";
  *   }, 100);
  * }
  */
-export const scrapePage = async (callback, BATCH_THRESHOLD, page = 1, currentBatch = []) => {
+export const scrapePage = async (callback, BATCH_SIZE, pageNumber = 1, currentBatch = []) => {
   try {
-    const listPage = await axiosInstance.get(`${BASE_URL}/anime-list.html?page=${page}`);
+    console.log(`\nScraping page ${pageNumber}...`);
+
+    const listPage = await axiosInstance.get(`${BASE_URL}/anime-list.html?page=${pageNumber}`);
     const $ = load(listPage.data);
 
     const hasNextPage = $("div.anime_name.anime_list > div > div > ul > li.selected")
@@ -39,27 +41,31 @@ export const scrapePage = async (callback, BATCH_THRESHOLD, page = 1, currentBat
     const currentPageItems = await Promise.all(
       $("section.content_left > div > div.anime_list_body > ul")
         .children()
-        .map((_index, anime) => {
+        .map(async (_index, anime) => {
           const animeUrl = $(anime).find("a").attr("href");
           const animeId = getLastUrlSection(animeUrl); // Will throw TypeError if animeUrl is undefined.
-          return limit(() => scrapeAnimeDetails(animeId));
+          return await limit(() => scrapeAnimeDetails(animeId));
         })
         .get()
     );
 
-    currentBatch = currentBatch.concat(currentPageItems);
+    console.log("Done!");
 
-    if (currentBatch.length >= BATCH_THRESHOLD) {
-      callback(currentBatch);
-      currentBatch = [];
+    for (const item of currentPageItems) {
+      currentBatch.push(item);
+
+      if (currentBatch.length >= BATCH_SIZE) {
+        await callback(currentBatch);
+        currentBatch = [];
+      }
     }
 
     if (hasNextPage) {
-      return scrapePage(callback, BATCH_THRESHOLD, page + 1, currentBatch);
+      return scrapePage(callback, BATCH_SIZE, pageNumber + 1, currentBatch);
     }
 
     if (currentBatch.length > 0) { // Handle remaining items on last page.
-      callback(currentBatch);
+      await callback(currentBatch);
     }
 
     return currentBatch;
