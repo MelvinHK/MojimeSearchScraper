@@ -58,8 +58,8 @@ export const fetchAnimeIdFromEpisodeId = async (episodeId) => {
   try {
     checkTypeError(episodeId, 'string');
 
-    const res = await axiosInstance.get(`${BASE_URL}/${episodeId}`);
-    const $ = load(res.data);
+    const episodePage = await axiosInstance.get(`${BASE_URL}/${episodeId}`);
+    const $ = load(episodePage.data);
 
     const animeUrl = $(
       '#wrapper_bg > section > section.content_left > div:nth-child(1) > div.anime_video_body > div.anime_video_body_cate > div.anime-info > a'

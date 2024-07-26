@@ -29,8 +29,8 @@ import "./types.js";
  */
 export const scrapePage = async (callback, BATCH_THRESHOLD, page = 1, currentBatch = []) => {
   try {
-    const response = await axiosInstance.get(`${BASE_URL}/anime-list.html?page=${page}`);
-    const $ = load(response.data);
+    const listPage = await axiosInstance.get(`${BASE_URL}/anime-list.html?page=${page}`);
+    const $ = load(listPage.data);
 
     const hasNextPage = $("div.anime_name.anime_list > div > div > ul > li.selected")
       .next()
