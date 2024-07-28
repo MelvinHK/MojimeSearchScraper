@@ -1,8 +1,8 @@
 import { load } from "cheerio";
 
-import { scrapeAnimeDetails, getLastUrlSection } from "./helpers.js";
+import { fetchAnimeDetails, getLastUrlSection } from "./helpers.js";
 import { BASE_URL, limit, axiosInstance } from "./config.js";
-import "./types.js";
+import "./models.js";
 
 /**
  * @overview Scrapes GoGoAnime's entire anime-list. 
@@ -42,10 +42,10 @@ export const scrapePage = async (callback, batchSize, pageNumber = 1, currentBat
     const currentPageItems = await Promise.all(
       $("section.content_left > div > div.anime_list_body > ul")
         .children()
-        .map(async (_index, anime) => {
-          const animeUrl = $(anime).find("a").attr("href");
+        .map(async (_index, item) => {
+          const animeUrl = $(item).find("a").attr("href");
           const animeId = getLastUrlSection(animeUrl); // Will throw TypeError if animeUrl is undefined.
-          return await limit(() => scrapeAnimeDetails(animeId));
+          return await limit(() => fetchAnimeDetails(animeId));
         })
         .get()
     );

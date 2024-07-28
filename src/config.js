@@ -14,7 +14,7 @@ axiosRetry(axiosInstance, {
   retryDelay: axiosRetry.exponentialDelay
 });
 
-export const limit = pLimit(10); // Concurrency limit in Promise.all().
+export const limit = pLimit(10); // Concurrency limit in very large Promise.all()'s.
 
 const uri = process.env.MONGODB_URI;
 export const mongoClient = new MongoClient(uri);

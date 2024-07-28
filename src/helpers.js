@@ -1,7 +1,7 @@
 import { load } from "cheerio";
 
 import { BASE_URL, axiosInstance } from "./config.js";
-import "./types.js";
+import "./models.js";
 
 /**
  * Scrapes and returns an anime's page details.
@@ -9,7 +9,7 @@ import "./types.js";
  * @param {string} animeId - The ID of an anime.
  * @returns {Promise<AnimeDetails>} A promise of the anime's details.
  */
-export const scrapeAnimeDetails = async (animeId) => {
+export const fetchAnimeDetails = async (animeId) => {
   try {
     checkTypeError(animeId, 'string');
 

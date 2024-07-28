@@ -6,3 +6,14 @@
  * @property {'dub' | 'sub'} subOrDub - Indicates whether the anime is subbed or dubbed.
  * @property {string[]} otherNames - Other names for the anime.
  */
+
+/**
+ * The recent release page's anime language/subtitle url parameter options.
+ * 
+ * @enum {number}
+ */
+const languageOptions = Object.freeze({
+  englishSub: 1,
+  englishDub: 2,
+  chinese: 3
+});
