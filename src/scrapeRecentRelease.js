@@ -37,7 +37,7 @@ const checkAndScrapeRecents = async () => {
 
       if (previous !== current) {
         const recentAnime = await scrapeRecents(previous, languageOption);
-
+        await updateMostRecentEpId();
         // Bulk write upsert to MongoDB
       } else {
         console.log(`No new updates found for language option ${languageOption}.`);
@@ -92,6 +92,24 @@ const fetchCurrentMostRecentEpId = async (languageOption) => {
   } catch (error) {
     console.log(`Scraping Error: Could not scrape most recent episode ID.`);
     throw error;
+  }
+};
+/**
+ * @param {Collection<Document>} collection - A MongoDB collection holding MostRecentEpisodeId objects.
+ * @param {number} languageOption 
+ * 
+ * @see LanguageOptions in ./models.js.
+ * @see MostRecentEpisodeId in ./models.js
+ */
+const updateMostRecentEpId = async (collection, languageOption) => {
+  try {
+    await collection.updateOne({ languageOption: languageOption }, {
+      $set: {
+        episodeId: current
+      }
+    });
+  } catch (error) {
+    console.log(`Update Error: Could not update most recent episode ID`);
   }
 };
 
