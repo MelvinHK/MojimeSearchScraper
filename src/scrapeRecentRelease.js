@@ -1,4 +1,5 @@
 import { load } from "cheerio";
+import { Collection, Document } from "mongodb";
 
 import {
   fetchAnimeDetails,
@@ -27,7 +28,7 @@ const checkAndScrapeRecents = async () => {
     .db(dbName)
     .collection(collNames.mostRecentEpisodeId);
 
-  for (const languageOption of Object.values(languageOptions)) {
+  for (const languageOption of Object.values(LanguageOptions)) {
     try {
       const [previous, current] = await Promise.all([
         getPreviousMostRecentEpId(languageOption, collection),
@@ -39,7 +40,7 @@ const checkAndScrapeRecents = async () => {
 
         // Bulk write upsert to MongoDB
       } else {
-        console.log(`No new updates found.`);
+        console.log(`No new updates found for language option ${languageOption}.`);
       }
     } catch (error) {
       console.log(`Error for language option ${languageOption}:`, error);
@@ -47,6 +48,15 @@ const checkAndScrapeRecents = async () => {
   }
 };
 
+/**
+ * 
+ * @param {Collection<Document>} collection - A MongoDB collection holding MostRecentEpisodeId objects.
+ * @param {number} languageOption
+ * @returns {Promise<string>} A promise returning the database's most recent episode ID.
+ * 
+ * @see LanguageOptions in ./models.js.
+ * @see MostRecentEpisodeId in ./models.js
+ */
 const getPreviousMostRecentEpId = async (collection, languageOption) => {
   try {
     return await collection.findOne({ languageOption: languageOption }).then(res => res.episodeId);
@@ -57,10 +67,12 @@ const getPreviousMostRecentEpId = async (collection, languageOption) => {
 };
 
 /**
- * Fetches
+ * Scrapes the most recent episode ID.
  * 
- * @param {number} languageOption - The page's anime language/subtitle option. See `languageOptions`.
- * @returns {Promise<string>} A promise returning the previous most-recent episode ID if a new one is found, otherwise null.
+ * @param {number} languageOption
+ * @returns {Promise<string>} A promise returning the most recent episode ID.
+ * 
+ * @see LanguageOptions in ./models.js.
  */
 const fetchCurrentMostRecentEpId = async (languageOption) => {
   try {
@@ -83,14 +95,16 @@ const fetchCurrentMostRecentEpId = async (languageOption) => {
 };
 
 /**
- * Recursively scrapes the recent release pages until the previous most recent episode ID is reached, 
+ * Recursively scrapes the recent release pages until a sentinel episode ID is reached, 
  * or until a page limit is reached.
  * 
  * @param {string} sentinelEpisodeId - The episode ID to scrape until.
- * @param {number} languageOption - The page's anime language/subtitle option. See `languageOptions`.
+ * @param {number} languageOption
  * @param {number} pageNumber - The page number to start on. Defaults to `1`.
  * @param {number} pageLimit - The max number of pages to scrape. Defaults to `5`.
  * @returns {Promise<AnimeDetails[]>} Returns all scraped anime details up until the previous most recent episode ID/page limit.
+ * 
+ * @see LanguageOptions in ./models.js.
  */
 const scrapeRecents = async (sentinelEpisodeId, languageOption, pageNumber = 1, pageLimit = 5) => {
   try {

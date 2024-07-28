@@ -8,11 +8,20 @@
  */
 
 /**
+ * @typedef {Object} MostRecentEpisodeId
+ * 
+ * @property {string} episodeId - The ID of the episode.
+ * @property {number} languageOption
+ * 
+ * @see LanguageOptions
+ */
+
+/**
  * The recent release page's anime language/subtitle url parameter options.
  * 
  * @enum {number}
  */
-const languageOptions = Object.freeze({
+const LanguageOptions = Object.freeze({
   englishSub: 1,
   englishDub: 2,
   chinese: 3
