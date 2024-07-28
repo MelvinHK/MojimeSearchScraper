@@ -12,11 +12,12 @@ import "./types.js";
 
 /**
  * Recursively scrapes all anime list pages for all anime details. 
- * After a specified batch-size threshold is exceeded, a callback may be performed with the batch.
+ * After a specified batch-size is reached, a callback may be performed with the batch.
  * 
- * @param {function(AnimeDetails[]): Promise | void} callback - Callback once BATCH_SIZE is reached.
- * @param {number} BATCH_SIZE - Threshold for the number of items per batch.
- * @param {number} pageNumber - The page number to start on. Defaults to 1. 
+ * @template T
+ * @param {function(AnimeDetails[]): (Promise<T> | void)} callback - Callback once `batchSize` is reached.
+ * @param {number} batchSize - Threshold for the number of items per batch.
+ * @param {number} pageNumber - The page number to start on. Defaults to `1`. 
  * @param {AnimeDetails[]} currentBatch - The currently collected items during recursion. Leave as default.
  * @returns {Promise<AnimeDetails[]>}
  * 
@@ -27,7 +28,7 @@ import "./types.js";
  *   }, 100);
  * }
  */
-export const scrapePage = async (callback, BATCH_SIZE, pageNumber = 1, currentBatch = []) => {
+export const scrapePage = async (callback, batchSize, pageNumber = 1, currentBatch = []) => {
   try {
     console.log(`\nScraping page ${pageNumber}...`);
 
@@ -54,14 +55,14 @@ export const scrapePage = async (callback, BATCH_SIZE, pageNumber = 1, currentBa
     for (const item of currentPageItems) {
       currentBatch.push(item);
 
-      if (currentBatch.length >= BATCH_SIZE) {
+      if (currentBatch.length >= batchSize) {
         await callback(currentBatch);
         currentBatch = [];
       }
     }
 
     if (hasNextPage) {
-      return scrapePage(callback, BATCH_SIZE, pageNumber + 1, currentBatch);
+      return scrapePage(callback, batchSize, pageNumber + 1, currentBatch);
     }
 
     if (currentBatch.length > 0) { // Handle remaining items on last page.
@@ -77,7 +78,7 @@ export const scrapePage = async (callback, BATCH_SIZE, pageNumber = 1, currentBa
         "It may be due to a network issue, or because the website layout has changed."
       );
     } else {
-      console.log("Error:", error);
+      console.log(error);
     }
     return [];
   }
