@@ -61,7 +61,7 @@ const getPreviousMostRecentEpId = async (collection, languageOption) => {
   try {
     return await collection.findOne({ languageOption: languageOption }).then(res => res.episodeId);
   } catch (error) {
-    console.log("Error getting");
+    console.log(`MongoDB Error: Could not get most recent episode ID.`);
     throw error;
   }
 };
@@ -90,6 +90,7 @@ const fetchCurrentMostRecentEpId = async (languageOption) => {
     return getLastUrlSection(mostRecentEpisodeUrl);
 
   } catch (error) {
+    console.log(`Scraping Error: Could not scrape most recent episode ID.`);
     throw error;
   }
 };
@@ -144,7 +145,7 @@ const scrapeRecents = async (sentinelEpisodeId, languageOption, pageNumber = 1, 
     return currentPageItems.concat(nextPageItems);
 
   } catch (error) {
-    console.error(`Error on page ${pageNumber} for language option ${languageOption}:`);
+    console.error(`Error on page ${pageNumber}:`);
     throw error;
   }
 };
