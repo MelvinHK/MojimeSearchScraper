@@ -1,7 +1,10 @@
 import { load } from "cheerio";
 
 import { BASE_URL, axiosInstance } from "./config.js";
-import "./models.js";
+
+/**
+ * @typedef {import('./models.js').AnimeDetails} AnimeDetails
+ */
 
 /**
  * Scrapes and returns an anime's page details.

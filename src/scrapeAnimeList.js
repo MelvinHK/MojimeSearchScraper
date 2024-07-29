@@ -2,12 +2,13 @@ import { load } from "cheerio";
 
 import { fetchAnimeDetails, getLastUrlSection } from "./helpers.js";
 import { BASE_URL, limit, axiosInstance } from "./config.js";
-import "./models.js";
 
 /**
  * @overview Scrapes GoGoAnime's entire anime-list. 
  * Duration depends on concurrency limit set in "./config.js".
- * Intended to run locally via `npm start`.
+ * Intended to run locally.
+ * 
+ * @typedef {import('./models.js').AnimeDetails} AnimeDetails
  */
 
 /**

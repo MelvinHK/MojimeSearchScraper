@@ -1,5 +1,9 @@
 import { scrapePage } from "./scrapeAnimeList.js";
 
+/**
+ * @overview This file runs during `npm start`; main() is executed.
+ */
+
 let totalProcessed = 0;
 let batchNo = 1;
 

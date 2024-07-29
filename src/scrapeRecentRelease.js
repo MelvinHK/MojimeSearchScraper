@@ -13,11 +13,13 @@ import {
   dbName,
   collNames
 } from "./config.js";
-import "./models.js";
 import { LanguageOptions } from "./models.js";
 
 /**
  * @overview This file contains functions to scrape GoGoAnime's recent release pages.
+ * 
+ * @typedef {import('./models.js').AnimeDetails} AnimeDetails
+ * @typedef {import('./models.js').MostRecentEpisode} MostRecentEpisode
  */
 
 /**
@@ -34,15 +36,19 @@ const checkAndScrapeRecents = async () => {
 
       if (previous !== current) {
         console.log(`New releases found for language ${languageOption}, processing...`);
+
         const recentAnime = await scrapeRecents(previous, languageOption);
+
         console.log(`Updated ${recentAnime.length} documents for language ${languageOption}.`);
-        // await updateMostRecentEpisode(current, languageOption);
+
+        await updateMostRecentEpisode(current, languageOption);
+
         // Bulk write upsert to MongoDB
       } else {
-        console.log(`No new updates found for language option ${languageOption}.`);
+        console.log(`No new updates found for language ${languageOption}.`);
       }
     } catch (error) {
-      console.log(`Error for language option ${languageOption}:`, error);
+      console.log(`Error for language ${languageOption}:`, error);
     }
   }
 };
