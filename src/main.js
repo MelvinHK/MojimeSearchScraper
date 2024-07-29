@@ -1,7 +1,7 @@
 import { scrapePage } from "./scrapeAnimeList.js";
 
 /**
- * @overview This file runs during `npm start`; main() is executed.
+ * @overview This file runs via `npm start`; main() is executed and scrapes GoGo's entire anime-list.
  */
 
 let totalProcessed = 0;
@@ -33,12 +33,13 @@ const logBatch = (batch) => {
 };
 
 const formatTimestamp = (elapsedMs) => {
-  const seconds = Math.floor(elapsedMs / 1000);
-  const hours = String(Math.floor(seconds / 3600)).padStart(2, '0');
-  const minutes = String(Math.floor((seconds % 3600) / 60)).padStart(2, '0');
-  const secs = String(seconds % 60).padStart(2, '0');
+  const elapsedS = Math.floor(elapsedMs / 1000);
 
-  return `${hours}:${minutes}:${secs}`;
+  const hours = String(Math.floor(elapsedS / 3600)).padStart(2, '0');
+  const minutes = String(Math.floor((elapsedS % 3600) / 60)).padStart(2, '0');
+  const seconds = String(elapsedS % 60).padStart(2, '0');
+
+  return `${hours}:${minutes}:${seconds}`;
 };
 
 main();
