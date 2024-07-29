@@ -1,5 +1,5 @@
 /**
- * @typedef {Object} AnimeDetails
+ * @typedef {Object} AnimeDetails - MongoDB document structure for anime details.
  * 
  * @property {string} id - The ID of the anime.
  * @property {string} title - The title of the anime.
@@ -8,7 +8,7 @@
  */
 
 /**
- * @typedef {Object} MostRecentEpisodeId
+ * @typedef {Object} MostRecentEpisode - MongoDB document structure for most recent episode released.
  * 
  * @property {string} episodeId - The ID of the episode.
  * @property {number} languageOption
