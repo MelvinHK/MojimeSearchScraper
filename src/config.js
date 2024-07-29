@@ -21,5 +21,5 @@ export const mongoClient = new MongoClient(uri);
 export const dbName = "MojimeDB";
 export const collNames = {
   animeDetails: "AnimeDetails",
-  mostRecentEpisodeId: "MostRecentEpisodeId"
+  mostRecentEpisodeIds: "MostRecentEpisodeIds"
 };

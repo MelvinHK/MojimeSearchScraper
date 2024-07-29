@@ -21,7 +21,7 @@
  * 
  * @enum {number}
  */
-const LanguageOptions = Object.freeze({
+export const LanguageOptions = Object.freeze({
   englishSub: 1,
   englishDub: 2,
   chinese: 3
