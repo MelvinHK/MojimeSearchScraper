@@ -1,3 +1,5 @@
+import { collNames } from "./config.js";
+import { bulkUpsert } from "./helpers.js";
 import { scrapePage } from "./scrapeAnimeList.js";
 
 /**
@@ -13,9 +15,9 @@ const main = async () => {
 
   await scrapePage(async (batch) => {
     console.log("\nBatch size reached, processing...");
-    
-    // Insert to MongoDB
-    
+
+    bulkUpsert(batch, "animeId", collNames.animeDetails);
+
     logBatch(batch);
   }, 500);
 

@@ -93,8 +93,7 @@ export const getLastUrlSection = (url) => {
 };
 
 /**
- * @template T
- * @param {T[]} documents - The array of documents to upsert.
+ * @param {AnimeDetails[]} documents - The array of AnimeDetails to upsert.
  * @param {string} uniqueField - The unique field to identify documents.
  * @param {string} collectionName - The name of the collection to write to.
  * @returns {Promise<BulkWriteResult>} The result of the bulk write operation.
@@ -103,12 +102,6 @@ export const bulkUpsert = async (documents, uniqueField, collectionName) => {
   if (!collNames[collectionName]) {
     throw new Error(
       `Bulk upsert failed: Collection "${collectionName}" does not exist. Check collNames "./config.js".`
-    );
-  }
-
-  if (!documents.every(doc => uniqueField in doc)) {
-    throw new Error(
-      `Bulk upsert failed: One or more documents are missing the unique field "${uniqueField}".`
     );
   }
 
