@@ -102,12 +102,14 @@ export const getLastUrlSection = (url) => {
 export const bulkUpsert = async (documents, uniqueField, collectionName) => {
   if (!collNames[collectionName]) {
     throw new Error(
-      `Collection "${collectionName}" does not exist. Check collNames "./config.js".`
+      `Bulk upsert failed: Collection "${collectionName}" does not exist. Check collNames "./config.js".`
     );
   }
 
   if (!documents.every(doc => uniqueField in doc)) {
-    throw new Error(`One or more documents are missing the unique field "${uniqueField}".`);
+    throw new Error(
+      `Bulk upsert failed: One or more documents are missing the unique field "${uniqueField}".`
+    );
   }
 
   const collection = mongoClient
