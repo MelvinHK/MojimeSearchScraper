@@ -19,7 +19,7 @@ export const limit = pLimit(10); // Concurrency limit in very large Promise.all(
 const uri = process.env.MONGODB_URI;
 export const mongoClient = new MongoClient(uri);
 export const dbName = "MojimeDB";
-export const collNames = {
+export const collNames = Object.freeze({
   animeDetails: "AnimeDetails",
   mostRecentEpisodeIds: "MostRecentEpisodeIds"
-};
+});

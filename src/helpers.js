@@ -1,6 +1,7 @@
 import { load } from "cheerio";
 
-import { BASE_URL, axiosInstance } from "./config.js";
+import { BASE_URL, axiosInstance, dbName, mongoClient } from "./config.js";
+import { BulkWriteResult } from "mongodb";
 
 /**
  * @typedef {import('./models.js').AnimeDetails} AnimeDetails
@@ -89,6 +90,34 @@ export const getLastUrlSection = (url) => {
 
   const sections = url.split('/');
   return sections[sections.length - 1] || sections[sections.length - 2]; // - 2 In case url ends with '/'.
+};
+
+/**
+ * @template T
+ * @param {T[]} documents - The array of documents to upsert.
+ * @param {string} uniqueField - The unique field to identify documents.
+ * @param {string} collectionName - The name of the collection to write to.
+ * @returns {Promise<BulkWriteResult>} The result of the bulk write operation.
+ */
+export const bulkUpsert = async (documents, uniqueField, collectionName) => {
+  const collection = mongoClient
+    .db(dbName)
+    .collection(collectionName);
+
+  const bulkOperations = documents.map(doc => ({
+    updateOne: {
+      filter: { [uniqueField]: doc[uniqueField] },
+      update: { $set: doc },
+      upsert: true
+    }
+  }));
+
+  try {
+    return await collection.bulkWrite(bulkOperations);
+  } catch (error) {
+    console.error('Bulk upsert failed:');
+    throw error;
+  }
 };
 
 /**

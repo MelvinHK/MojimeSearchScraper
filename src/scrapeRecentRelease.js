@@ -3,7 +3,8 @@ import { load } from "cheerio";
 import {
   fetchAnimeDetails,
   getLastUrlSection,
-  fetchAnimeIdFromEpisodeId
+  fetchAnimeIdFromEpisodeId,
+  bulkUpsert
 } from "./helpers.js";
 import {
   AJAX_URL,
@@ -26,6 +27,9 @@ import { LanguageOptions } from "./models.js";
  * The initialization function, intended to run server-side; schedule every hour.
  */
 const checkAndScrapeRecents = async () => {
+  const logNoUpdates = (languageOption) =>
+    console.log(`No new updates found for language ${languageOption}.`);
+
   for (const languageOption of Object.values(LanguageOptions)) {
     console.log(`Checking language ${languageOption}...`);
     try {
@@ -34,21 +38,31 @@ const checkAndScrapeRecents = async () => {
         fetchCurrentMostRecentEpId(languageOption)
       ]);
 
-      if (previousEpId !== currentEpId) {
-        console.log(`New releases found for language ${languageOption}, processing...`);
+      if (previousEpId === currentEpId) {
+        logNoUpdates(languageOption);
+        continue;
+      }
 
-        const recentAnime = await scrapeRecents(previousEpId, languageOption);
+      console.log(`New episode(s) found for language ${languageOption}, processing...`);
 
-        console.log(`Updated ${recentAnime.length} documents for language ${languageOption}.`);
+      const recentAnime = await scrapeRecents(previousEpId, languageOption);
 
-        await updateMostRecentEpisode({
+      console.log(`Found ${recentAnime.length} new episode(s) for language ${languageOption}.`);
+
+      const [bulkUpsertResult, _] = await Promise.all([
+        bulkUpsert(recentAnime, "animeId", collNames.animeDetails),
+        updateMostRecentEpisode({
           episodeId: currentEpId,
           languageOption: languageOption
-        });
+        })
+      ]);
 
-        // Bulk write upsert to MongoDB
+      const newAnimeCount = bulkUpsertResult.insertedCount;
+
+      if (newAnimeCount > 0) {
+        console.log(`Inserted ${newAnimeCount} new anime.`);
       } else {
-        console.log(`No new updates found for language ${languageOption}.`);
+        logNoUpdates(languageOption);
       }
     } catch (error) {
       console.log(`Error for language ${languageOption}:`, error);
