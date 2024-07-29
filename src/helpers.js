@@ -106,6 +106,10 @@ export const bulkUpsert = async (documents, uniqueField, collectionName) => {
     );
   }
 
+  if (!documents.every(doc => uniqueField in doc)) {
+    throw new Error(`One or more documents are missing the unique field "${uniqueField}".`);
+  }
+
   const collection = mongoClient
     .db(dbName)
     .collection(collectionName);
