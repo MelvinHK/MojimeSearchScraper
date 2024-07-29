@@ -33,9 +33,6 @@ import { LanguageOptions } from "./models.js";
  * @see {@link MostRecentEpisode}
  */
 const checkAndScrapeRecents = async () => {
-  const logNoUpdates = (languageOption) =>
-    console.log(`No new updates found for language ${languageOption}.`);
-
   for (const languageOption of Object.values(LanguageOptions)) {
     console.log(`Checking language ${languageOption}...`);
     try {
@@ -45,7 +42,7 @@ const checkAndScrapeRecents = async () => {
       ]);
 
       if (previousEpId === currentEpId) {
-        logNoUpdates(languageOption);
+        console.log(`No new updates found for language ${languageOption}.`);
         continue;
       }
 
@@ -53,7 +50,7 @@ const checkAndScrapeRecents = async () => {
 
       const recentAnime = await scrapeRecents(previousEpId, languageOption);
 
-      console.log(`Found ${recentAnime.length} new episode(s) for language ${languageOption}.`);
+      console.log(`Found ${recentAnime.length} new episode(s) for language ${languageOption}. Inserting any new anime...`);
 
       const [bulkUpsertResult, _] = await Promise.all([
         bulkUpsert(recentAnime, "animeId", collNames.animeDetails),
@@ -68,7 +65,7 @@ const checkAndScrapeRecents = async () => {
       if (newAnimeCount > 0) {
         console.log(`Inserted ${newAnimeCount} new anime.`);
       } else {
-        logNoUpdates(languageOption);
+        console.log(`No new anime were inserted.`);
       }
     } catch (error) {
       console.log(`Error for language ${languageOption}:`, error);
