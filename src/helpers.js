@@ -102,7 +102,7 @@ export const getLastUrlSection = (url) => {
 export const bulkUpsert = async (documents, uniqueField, collectionName) => {
   if (!collNames[collectionName]) {
     throw new Error(
-      `Collection ${collectionName} does not exist. Check collNames "./config.js".`
+      `Collection "${collectionName}" does not exist. Check collNames "./config.js".`
     );
   }
 
