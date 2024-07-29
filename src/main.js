@@ -16,7 +16,7 @@ const main = async () => {
   await scrapePage(async (batch) => {
     console.log("\nBatch size reached, processing...");
 
-    bulkUpsert(batch, "animeId", collNames.animeDetails);
+    await bulkUpsert(batch, "animeId", collNames.animeDetails);
 
     logBatch(batch);
   }, 500);
