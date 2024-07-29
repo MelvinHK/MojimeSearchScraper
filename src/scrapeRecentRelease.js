@@ -43,7 +43,7 @@ const checkAndScrapeRecents = async () => {
         continue;
       }
 
-      console.log(`New episode(s) found for language ${languageOption}, processing...`);
+      console.log(`New episode(s) available for language ${languageOption}, processing...`);
 
       const recentAnime = await scrapeRecents(previousEpId, languageOption);
 
