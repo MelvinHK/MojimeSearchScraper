@@ -25,6 +25,8 @@ import { LanguageOptions } from "./models.js";
 
 /**
  * The initialization function, intended to run server-side; schedule every hour.
+ * It's assumed that, for each of the languageOptions, a previous most recent episode exists in the database.
+ * If not, they should be manually inserted.
  */
 const checkAndScrapeRecents = async () => {
   const logNoUpdates = (languageOption) =>
