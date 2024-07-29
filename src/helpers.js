@@ -35,7 +35,7 @@ export const fetchAnimeDetails = async (animeId) => {
     const subOrDub = title.includes('(Dub)') ? 'dub' : 'sub';
 
     return {
-      id: animeId,
+      animeId: animeId,
       title: title,
       subOrDub: subOrDub,
       otherNames: otherNames,

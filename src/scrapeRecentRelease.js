@@ -29,19 +29,22 @@ const checkAndScrapeRecents = async () => {
   for (const languageOption of Object.values(LanguageOptions)) {
     console.log(`Checking language ${languageOption}...`);
     try {
-      const [previous, current] = await Promise.all([
+      const [previousEpId, currentEpId] = await Promise.all([
         getPreviousMostRecentEpId(languageOption),
         fetchCurrentMostRecentEpId(languageOption)
       ]);
 
-      if (previous !== current) {
+      if (previousEpId !== currentEpId) {
         console.log(`New releases found for language ${languageOption}, processing...`);
 
-        const recentAnime = await scrapeRecents(previous, languageOption);
+        const recentAnime = await scrapeRecents(previousEpId, languageOption);
 
         console.log(`Updated ${recentAnime.length} documents for language ${languageOption}.`);
 
-        await updateMostRecentEpisode(current, languageOption);
+        await updateMostRecentEpisode({
+          episodeId: currentEpId,
+          languageOption: languageOption
+        });
 
         // Bulk write upsert to MongoDB
       } else {
@@ -103,21 +106,19 @@ const fetchCurrentMostRecentEpId = async (languageOption) => {
   }
 };
 /**
- * @param {string} newEpisodeId - The new most recent episode ID.
- * @param {number} languageOption 
+ * Updates 
  * 
- * @see LanguageOptions in ./models.js.
- * @see MostRecentEpisode in ./models.js
+ * @param {MostRecentEpisode} episode - The new most recent episode.
  */
-const updateMostRecentEpisode = async (newEpisodeId, languageOption) => {
+const updateMostRecentEpisode = async (episode) => {
   try {
     const collection = mongoClient
       .db(dbName)
       .collection(collNames.mostRecentEpisodeIds);
 
-    await collection.updateOne({ languageOption: languageOption }, {
+    await collection.updateOne({ languageOption: episode.languageOption }, {
       $set: {
-        episodeId: newEpisodeId
+        episodeId: episode.episodeId
       }
     });
   } catch (error) {
