@@ -1,6 +1,6 @@
 import { load } from "cheerio";
 
-import { BASE_URL, axiosInstance, dbName, mongoClient } from "./config.js";
+import { BASE_URL, axiosInstance, collNames, dbName, mongoClient } from "./config.js";
 import { BulkWriteResult } from "mongodb";
 
 /**
@@ -100,6 +100,12 @@ export const getLastUrlSection = (url) => {
  * @returns {Promise<BulkWriteResult>} The result of the bulk write operation.
  */
 export const bulkUpsert = async (documents, uniqueField, collectionName) => {
+  if (!collNames[collectionName]) {
+    throw new Error(
+      `Collection ${collectionName} does not exist. Check collNames "./config.js".`
+    );
+  }
+
   const collection = mongoClient
     .db(dbName)
     .collection(collectionName);
