@@ -25,8 +25,12 @@ import { LanguageOptions } from "./models.js";
 
 /**
  * The initialization function, intended to run server-side; schedule every hour.
- * It's assumed that, for each of the languageOptions, a previous most recent episode exists in the database.
- * If not, they should be manually inserted.
+ * 
+ * It's assumed that, for each of the options in `LanguageOptions`, a previous most recent episode exists in the database.
+ * If not, they should be manually inserted following the `MostRecentEpisode` structure.
+ * 
+ * @see {@link LanguageOptions} 
+ * @see {@link MostRecentEpisode}
  */
 const checkAndScrapeRecents = async () => {
   const logNoUpdates = (languageOption) =>
@@ -78,7 +82,7 @@ const checkAndScrapeRecents = async () => {
  * @param {number} languageOption
  * @returns {Promise<string>} A promise returning the database's most recent episode ID.
  * 
- * @see LanguageOptions in ./models.js.
+ * @see {@link LanguageOptions}
  */
 const getPreviousMostRecentEpId = async (languageOption) => {
   const collection = mongoClient
@@ -99,7 +103,7 @@ const getPreviousMostRecentEpId = async (languageOption) => {
  * @param {number} languageOption
  * @returns {Promise<string>} A promise returning the most recent episode ID.
  * 
- * @see LanguageOptions in ./models.js.
+ * @see {@link LanguageOptions}
  */
 const fetchCurrentMostRecentEpId = async (languageOption) => {
   try {
@@ -152,7 +156,7 @@ const updateMostRecentEpisode = async (episode) => {
  * @param {number} pageLimit - The max number of pages to scrape. Defaults to `5`.
  * @returns {Promise<AnimeDetails[]>} Returns all scraped anime details up until the sentinel episode ID/page limit.
  * 
- * @see LanguageOptions in ./models.js.
+ * @see {@link LanguageOptions}
  */
 const scrapeRecents = async (sentinelEpisodeId, languageOption, pageNumber = 1, pageLimit = 5) => {
   try {

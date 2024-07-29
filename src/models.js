@@ -12,8 +12,6 @@
  * 
  * @property {string} episodeId - The ID of the episode.
  * @property {number} languageOption
- * 
- * @see LanguageOptions
  */
 
 /**

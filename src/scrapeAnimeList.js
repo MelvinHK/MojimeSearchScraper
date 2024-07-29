@@ -28,6 +28,8 @@ import { BASE_URL, limit, axiosInstance } from "./config.js";
  *     // Do something after 100 in batch. 
  *   }, 100);
  * }
+ * 
+ * @see {@link limit} for the concurrency limit of scraping anime details.
  */
 export const scrapePage = async (callback, batchSize, pageNumber = 1, currentBatch = []) => {
   try {
