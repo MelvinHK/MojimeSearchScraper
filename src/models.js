@@ -15,7 +15,7 @@
  */
 
 /**
- * The recent releases are split into three subtitle/language-option pages.
+ * For recent releases, the anime are split into three subtitle/language-option pages.
  * 
  * @enum {number}
  */
