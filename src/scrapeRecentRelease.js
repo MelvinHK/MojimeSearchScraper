@@ -4,29 +4,32 @@ import {
   fetchAnimeDetails,
   getLastUrlSection,
   fetchAnimeIdFromEpisodeId,
-  bulkUpsert
-} from "./helpers.js";
+} from "./helpers/scraping.js";
+import {
+  bulkUpsert,
+  getDocument,
+  updateDocument
+} from "./helpers/mongoDB.js";
 import {
   AJAX_URL,
   limit,
   axiosInstance,
-  mongoClient,
-  dbName,
   collNames
 } from "./config.js";
 import { LanguageOptions } from "./models.js";
 
 /**
- * @overview This file contains functions to scrape GoGoAnime's recent release pages.
+ * @overview This file scrapes GoGoAnime's recent release pages and is intended to be executed server-side every hour.
  * 
  * @typedef {import('./models.js').AnimeDetails} AnimeDetails
  * @typedef {import('./models.js').MostRecentEpisode} MostRecentEpisode
  */
 
 /**
- * The initialization function, intended to run server-side; schedule every hour.
+ * The initialization function. Checks for new episodes by comparing a most-recent episode in the database
+ * with a scraped most-recent episode. The episodes are bulk upserted, where any new anime are inserted.
  * 
- * It's assumed that, for each of the options in `LanguageOptions`, a previous most recent episode exists in the database.
+ * It's assumed that, for each option in the enum `LanguageOptions`, a most-recent episode exists in the database.
  * If not, they should be manually inserted following the `MostRecentEpisode` structure.
  * 
  * @see {@link LanguageOptions} 
@@ -36,28 +39,31 @@ const checkAndScrapeRecents = async () => {
   for (const languageOption of Object.values(LanguageOptions)) {
     console.log(`Checking language ${languageOption}...`);
     try {
-      const [previousEpId, currentEpId] = await Promise.all([
-        getPreviousMostRecentEpId(languageOption),
-        fetchCurrentMostRecentEpId(languageOption)
+      const [dbEpisodeId, scrapedEpisodeId] = await Promise.all([
+        getDocument(collNames.mostRecentEpisodeIds, { languageOption: languageOption })
+          .then(res => res.episodeId),
+        scrapeMostRecentEpId(languageOption)
       ]);
 
-      if (previousEpId === currentEpId) {
+      if (dbEpisodeId === scrapedEpisodeId) {
         console.log(`No new updates found for language ${languageOption}.`);
         continue;
       }
 
       console.log(`New episode(s) available for language ${languageOption}, processing...`);
 
-      const recentAnime = await scrapeRecents(previousEpId, languageOption);
+      const recentAnime = await scrapeRecents(dbEpisodeId, languageOption);
 
       console.log(`Found ${recentAnime.length} new episode(s) for language ${languageOption}. Inserting any new anime...`);
 
       const [bulkUpsertResult, _] = await Promise.all([
         bulkUpsert(recentAnime, "animeId", collNames.animeDetails),
-        updateMostRecentEpisode({
-          episodeId: currentEpId,
-          languageOption: languageOption
-        })
+        updateDocument(
+          collNames.mostRecentEpisodeIds,
+          { languageOption: languageOption },
+          "episodeId",
+          scrapedEpisodeId
+        )
       ]);
 
       const newAnimeCount = bulkUpsertResult.insertedCount;
@@ -74,27 +80,6 @@ const checkAndScrapeRecents = async () => {
 };
 
 /**
- * Gets the database's most recent episode ID.
- * 
- * @param {number} languageOption
- * @returns {Promise<string>} A promise returning the database's most recent episode ID.
- * 
- * @see {@link LanguageOptions}
- */
-const getPreviousMostRecentEpId = async (languageOption) => {
-  const collection = mongoClient
-    .db(dbName)
-    .collection(collNames.mostRecentEpisodeIds);
-
-  try {
-    return await collection.findOne({ languageOption: languageOption }).then(res => res.episodeId);
-  } catch (error) {
-    console.log(`MongoDB Error: Could not get most recent episode ID.`);
-    throw error;
-  }
-};
-
-/**
  * Scrapes the most recent episode ID.
  * 
  * @param {number} languageOption
@@ -102,7 +87,7 @@ const getPreviousMostRecentEpId = async (languageOption) => {
  * 
  * @see {@link LanguageOptions}
  */
-const fetchCurrentMostRecentEpId = async (languageOption) => {
+const scrapeMostRecentEpId = async (languageOption) => {
   try {
     const recentsPage = await axiosInstance.get(
       `${AJAX_URL}/page-recent-release.html?page=1&type=${languageOption}`
@@ -120,26 +105,6 @@ const fetchCurrentMostRecentEpId = async (languageOption) => {
   } catch (error) {
     console.log(`Scraping Error: Could not scrape most recent episode ID.`);
     throw error;
-  }
-};
-/**
- * Updates 
- * 
- * @param {MostRecentEpisode} episode - The new most recent episode.
- */
-const updateMostRecentEpisode = async (episode) => {
-  try {
-    const collection = mongoClient
-      .db(dbName)
-      .collection(collNames.mostRecentEpisodeIds);
-
-    await collection.updateOne({ languageOption: episode.languageOption }, {
-      $set: {
-        episodeId: episode.episodeId
-      }
-    });
-  } catch (error) {
-    console.log(`Update Error: Could not update most recent episode ID`);
   }
 };
 
@@ -197,3 +162,5 @@ const scrapeRecents = async (sentinelEpisodeId, languageOption, pageNumber = 1, 
     throw error;
   }
 };
+
+checkAndScrapeRecents();

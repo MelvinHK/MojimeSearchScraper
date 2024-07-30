@@ -15,7 +15,7 @@
  */
 
 /**
- * The recent release page's anime language/subtitle url parameter options.
+ * The recent releases are split into three subtitle/language-option pages.
  * 
  * @enum {number}
  */

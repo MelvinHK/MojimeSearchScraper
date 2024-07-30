@@ -1,5 +1,5 @@
 import { collNames } from "./config.js";
-import { bulkUpsert } from "./helpers.js";
+import { bulkUpsert } from "./helpers/mongoDB.js";
 import { scrapePage } from "./scrapeAnimeList.js";
 
 /**

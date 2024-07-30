@@ -1,6 +1,6 @@
 import { load } from "cheerio";
 
-import { fetchAnimeDetails, getLastUrlSection } from "./helpers.js";
+import { fetchAnimeDetails, getLastUrlSection } from "./helpers/scraping.js";
 import { BASE_URL, limit, axiosInstance } from "./config.js";
 
 /**
