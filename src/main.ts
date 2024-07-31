@@ -1,6 +1,7 @@
-import { collNames } from "./config.js";
-import { bulkUpsert } from "./helpers/mongoDB.js";
-import { scrapePage } from "./scrapeAnimeList.js";
+import { collNames } from "./config"
+import { bulkUpsert } from "./helpers/mongoDB";
+import { AnimeDetails } from "./models";
+import { scrapePage } from "./scrapeAnimeList"
 
 /**
  * @overview This file runs via `npm start`; main() is executed and scrapes GoGo's entire anime-list.
@@ -13,7 +14,7 @@ const main = async () => {
   const startTime = performance.now();
   console.log("Starting full anime-list scrape...");
 
-  await scrapePage(async (batch) => {
+  await scrapePage(async (batch: AnimeDetails[]) => {
     console.log("\nBatch size reached, processing...");
 
     await bulkUpsert(batch, "animeId", collNames.animeDetails);
@@ -25,7 +26,7 @@ const main = async () => {
   console.log(`\nScrape completed. Duration (hh:mm:ss): ${formatTimestamp(endTime - startTime)}`);
 };
 
-const logBatch = (batch) => {
+const logBatch = (batch: AnimeDetails[]) => {
   console.log(
     `\nBatch ${batchNo++} processed:`,
     '\nFirst item:', batch[0],
@@ -34,7 +35,7 @@ const logBatch = (batch) => {
   );
 };
 
-const formatTimestamp = (elapsedMs) => {
+const formatTimestamp = (elapsedMs: number) => {
   const elapsedS = Math.floor(elapsedMs / 1000);
 
   const hours = String(Math.floor(elapsedS / 3600)).padStart(2, '0');

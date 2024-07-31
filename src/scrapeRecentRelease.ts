@@ -4,25 +4,22 @@ import {
   fetchAnimeDetails,
   getLastUrlSection,
   fetchAnimeIdFromEpisodeId,
-} from "./helpers/scraping.js";
+} from "./helpers/scraping";
 import {
   bulkUpsert,
   getDocument,
   updateDocument
-} from "./helpers/mongoDB.js";
+} from "./helpers/mongoDB";
 import {
   AJAX_URL,
   limit,
   axiosInstance,
   collNames
-} from "./config.js";
-import { LanguageOptions } from "./models.js";
+} from "./config";
+import { AnimeDetails, LanguageOptions, MostRecentEpisode } from "./models";
 
 /**
  * @overview This file scrapes GoGoAnime's recent release pages and is intended to be executed server-side every hour.
- * 
- * @typedef {import('./models.js').AnimeDetails} AnimeDetails
- * @typedef {import('./models.js').MostRecentEpisode} MostRecentEpisode
  */
 
 /**
@@ -40,8 +37,8 @@ const checkAndScrapeRecents = async () => {
     console.log(`Checking language ${languageOption}...`);
     try {
       const [dbEpisodeId, scrapedEpisodeId] = await Promise.all([
-        getDocument(collNames.mostRecentEpisodeIds, { languageOption: languageOption })
-          .then(res => res.episodeId),
+        getDocument(collNames.MostRecentEpisodeIds, { languageOption: languageOption })
+          .then(res => res?.episodeId),
         scrapeMostRecentEpId(languageOption)
       ]);
 
@@ -57,9 +54,9 @@ const checkAndScrapeRecents = async () => {
       console.log(`Found ${recentAnime.length} new episode(s) for language ${languageOption}. Inserting any new anime...`);
 
       const [bulkUpsertResult, _] = await Promise.all([
-        bulkUpsert(recentAnime, "animeId", collNames.animeDetails),
+        bulkUpsert(recentAnime, "animeId", collNames.AnimeDetails),
         updateDocument(
-          collNames.mostRecentEpisodeIds,
+          collNames.MostRecentEpisodeIds,
           { languageOption: languageOption },
           "episodeId",
           scrapedEpisodeId
@@ -87,7 +84,7 @@ const checkAndScrapeRecents = async () => {
  * 
  * @see {@link LanguageOptions}
  */
-const scrapeMostRecentEpId = async (languageOption) => {
+const scrapeMostRecentEpId = async (languageOption: number): Promise<string> => {
   try {
     const recentsPage = await axiosInstance.get(
       `${AJAX_URL}/page-recent-release.html?page=1&type=${languageOption}`
@@ -112,15 +109,14 @@ const scrapeMostRecentEpId = async (languageOption) => {
  * Recursively scrapes the recent release pages until a sentinel episode ID is reached, 
  * or until a page limit is reached.
  * 
- * @param {string} sentinelEpisodeId - The episode ID to scrape until.
- * @param {number} languageOption
- * @param {number} pageNumber - The page number to start on. Defaults to `1`.
- * @param {number} pageLimit - The max number of pages to scrape. Defaults to `5`.
- * @returns {Promise<AnimeDetails[]>} Returns all scraped anime details up until the sentinel episode ID/page limit.
- * 
  * @see {@link LanguageOptions}
  */
-const scrapeRecents = async (sentinelEpisodeId, languageOption, pageNumber = 1, pageLimit = 5) => {
+const scrapeRecents = async (
+  sentinelEpisodeId: string,
+  languageOption: number,
+  pageNumber: number = 1,
+  pageLimit: number = 5
+): Promise<AnimeDetails[]> => {
   try {
     const recentsPage = await axiosInstance.get(
       `${AJAX_URL}/page-recent-release.html?page=${pageNumber}&type=${languageOption}`

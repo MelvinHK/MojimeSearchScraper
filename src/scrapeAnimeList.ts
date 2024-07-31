@@ -1,37 +1,27 @@
 import { load } from "cheerio";
 
-import { fetchAnimeDetails, getLastUrlSection } from "./helpers/scraping.js";
+import { fetchAnimeDetails, getLastUrlSection } from "./helpers/scraping";
 import { BASE_URL, limit, axiosInstance } from "./config.js";
+import { AnimeDetails } from "./models";
 
 /**
  * @overview Scrapes GoGoAnime's entire anime-list. 
  * Duration depends on concurrency limit set in "./config.js".
  * Intended to run locally.
- * 
- * @typedef {import('./models.js').AnimeDetails} AnimeDetails
  */
 
 /**
  * Recursively scrapes all anime list pages for all anime details. 
  * After a specified batch-size is reached, a callback may be performed with the batch.
  * 
- * @template T
- * @param {function(AnimeDetails[]): (Promise<T> | void)} callback - Callback once `batchSize` is reached.
- * @param {number} batchSize - Threshold for the number of items per batch.
- * @param {number} pageNumber - The page number to start on. Defaults to `1`. 
- * @param {AnimeDetails[]} currentBatch - The currently collected items during recursion. Leave as default.
- * @returns {Promise<AnimeDetails[]>}
- * 
- * @example
- * async () => {
- *   await scrapePage((batch) => { 
- *     // Do something after 100 in batch. 
- *   }, 100);
- * }
- * 
  * @see {@link limit} for the concurrency limit of scraping anime details.
  */
-export const scrapePage = async (callback, batchSize, pageNumber = 1, currentBatch = []) => {
+export const scrapePage = async <T>(
+  callback: (batch: AnimeDetails[]) => Promise<T> | void,
+  batchSize: number,
+  pageNumber: number = 1,
+  currentBatch: AnimeDetails[] = []
+): Promise<AnimeDetails[]> => {
   try {
     console.log(`\nScraping page ${pageNumber}...`);
 
@@ -47,7 +37,7 @@ export const scrapePage = async (callback, batchSize, pageNumber = 1, currentBat
         .children()
         .map(async (_index, item) => {
           const animeUrl = $(item).find("a").attr("href");
-          const animeId = getLastUrlSection(animeUrl); // Will throw TypeError if animeUrl is undefined.
+          const animeId = getLastUrlSection(animeUrl);
           return await limit(() => fetchAnimeDetails(animeId));
         })
         .get()
@@ -75,14 +65,7 @@ export const scrapePage = async (callback, batchSize, pageNumber = 1, currentBat
     return currentBatch;
 
   } catch (error) {
-    if (error instanceof TypeError) {
-      console.log(
-        "TypeError: animeUrl is undefined; it was unable to be scraped. " +
-        "It may be due to a network issue, or because the website layout has changed."
-      );
-    } else {
-      console.log(error);
-    }
+    console.log(error);
     return [];
   }
 };

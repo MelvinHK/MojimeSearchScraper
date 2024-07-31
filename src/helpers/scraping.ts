@@ -1,21 +1,13 @@
 import { load } from "cheerio";
 
 import { BASE_URL, axiosInstance } from "../config.js";
-
-/**
- * @typedef {import('../models.js').AnimeDetails} AnimeDetails
- */
+import { AnimeDetails } from "../models.js";
 
 /**
  * Scrapes and returns an anime's page details.
- * 
- * @param {string} animeId - The ID of an anime.
- * @returns {Promise<AnimeDetails>} A promise of the anime's details.
  */
-export const fetchAnimeDetails = async (animeId) => {
+export const fetchAnimeDetails = async (animeId: string): Promise<AnimeDetails> => {
   try {
-    checkTypeError(animeId, 'string');
-
     const animeDetailsPage = await axiosInstance.get(`${BASE_URL}/category/${animeId}`);
 
     const $ = load(animeDetailsPage.data);
@@ -48,19 +40,14 @@ export const fetchAnimeDetails = async (animeId) => {
 /**
  * Fetches the episode ID's corresponding anime ID.
  * 
- * @param {string} episodeId - The ID of an episode.
- * @returns {Promise<string>} A promise of the corresponding anime ID.
- * 
  * @example
  * async () => {
  *   const animeId = await fetchAnimeIdFromEpisodeId('naruto-episode-1');
  *   console.log(animeId); // 'naruto'
  * }
  */
-export const fetchAnimeIdFromEpisodeId = async (episodeId) => {
+export const fetchAnimeIdFromEpisodeId = async (episodeId: string): Promise<string> => {
   try {
-    checkTypeError(episodeId, 'string');
-
     const episodePage = await axiosInstance.get(`${BASE_URL}/${episodeId}`);
     const $ = load(episodePage.data);
 
@@ -76,26 +63,17 @@ export const fetchAnimeIdFromEpisodeId = async (episodeId) => {
 
 /**
  * Gets the last section of a URL separated by '/'.
- * 
- * @param {string} url - The URL to process.
- * @returns {string} The last section of the URL.
- * 
+ * Will throw an error if the url is undefined, intended to terminate recursion functions.
+ *
  * @example
  * getLastUrlSection('https://anitaku.pe/naruto-episode-1');
  * // returns 'naruto-episode-1'
  */
-export const getLastUrlSection = (url) => {
-  checkTypeError(url, 'string');
+export const getLastUrlSection = (url: string | undefined): string => {
+  if (!url) {
+    throw new Error("Error: URL is undefined; could not get last section.");
+  }
 
   const sections = url.split('/');
   return sections[sections.length - 1] || sections[sections.length - 2]; // - 2 In case url ends with '/'.
-};
-
-/**
- * @throws {TypeError}
- */
-const checkTypeError = (checkedParam, type) => {
-  if (typeof checkedParam !== type) {
-    throw new TypeError(`The ${checkedParam} parameter must be of type ${type}.`);
-  }
 };

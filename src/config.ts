@@ -17,9 +17,14 @@ axiosRetry(axiosInstance, {
 export const limit = pLimit(10); // Concurrency limit in very large Promise.all()'s.
 
 const uri = process.env.MONGODB_URI;
+
+if (!uri) {
+  throw new Error("MONGODB_URI is not defined in the environment variables.");
+}
+
 export const mongoClient = new MongoClient(uri);
 export const dbName = "MojimeDB";
 export const collNames = Object.freeze({
-  animeDetails: "AnimeDetails",
-  mostRecentEpisodeIds: "MostRecentEpisodeIds"
+  AnimeDetails: "AnimeDetails",
+  MostRecentEpisodeIds: "MostRecentEpisodeIds"
 });

@@ -1,6 +1,6 @@
-import { Filter, Document, WithId, BulkWriteResult } from "mongodb";
-
-import { collNames, dbName, mongoClient } from "../config.js";
+import { BulkWriteResult, Document, Filter, WithId } from "mongodb";
+import { collNames, dbName, mongoClient } from "../config";
+import { AnimeDetails } from "../models";
 
 /**
  * @param {AnimeDetails[]} documents - The array of AnimeDetails to upsert.
@@ -8,12 +8,13 @@ import { collNames, dbName, mongoClient } from "../config.js";
  * @param {string} collectionName - The name of the collection to write to.
  * @returns {Promise<BulkWriteResult>} The result of the bulk write operation.
  */
-export const bulkUpsert = async (documents, uniqueField, collectionName) => {
-  if (!collNames[collectionName]) {
-    throw new Error(
-      `Bulk upsert failed: Collection "${collectionName}" does not exist. Check collNames "./config.js".`
-    );
-  }
+export const bulkUpsert = async <T extends keyof AnimeDetails>(
+  documents: AnimeDetails[],
+  uniqueField: T,
+  collectionName: string
+): Promise<BulkWriteResult> => {
+
+  checkCollectionNameExists(collectionName, "Bulk upsert");
 
   const collection = mongoClient
     .db(dbName)
@@ -35,12 +36,9 @@ export const bulkUpsert = async (documents, uniqueField, collectionName) => {
   }
 };
 
-/** 
- * @param {string} collectionName
- * @param {Filter<Document>} filter
- * @returns {Promise<WithId<Document> | null>}
- */
-export const getDocument = async (collectionName, filter = {}) => {
+export const getDocument = async (collectionName: string, filter: Filter<Document> = {}): Promise<WithId<Document> | null> => {
+  checkCollectionNameExists(collectionName, "Get document");
+
   const collection = mongoClient
     .db(dbName)
     .collection(collectionName);
@@ -53,15 +51,12 @@ export const getDocument = async (collectionName, filter = {}) => {
   }
 };
 
-/**
- * @template T
- * @param {string} collectionName
- * @param {Filter<Document>} filter
- * @param {string} fieldName
- * @param {T} fieldValue
- * @returns {Promise<void>}
- */
-export const updateDocument = async (collectionName, filter, fieldName, fieldValue) => {
+export const updateDocument = async <T>(
+  collectionName: string,
+  filter: Filter<Document>,
+  fieldName: string,
+  fieldValue: T
+): Promise<void> => {
   try {
     const collection = mongoClient
       .db(dbName)
@@ -77,3 +72,16 @@ export const updateDocument = async (collectionName, filter, fieldName, fieldVal
     throw error;
   }
 };
+
+const checkCollectionNameExists = (key: string, operationName: string = "Operation") => {
+  if (!(key in collNames)) {
+    throw new Error(
+      `${operationName} failed: Collection "${key}" does not exist. Check collNames "./config.js".`
+    );
+  }
+}
+
+(async () => {
+  const a = await updateDocument(collNames.MostRecentEpisodeIds, { languageOption: 1 }, "episodeId", "na-nare-hana-nare-episode-4");
+  console.log("done updating");
+})();
