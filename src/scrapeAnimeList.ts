@@ -1,14 +1,36 @@
 import { load } from "cheerio";
 
 import { fetchAnimeDetails, getLastUrlSection } from "./helpers/scraping";
-import { BASE_URL, limit, axiosInstance } from "./config.js";
+import { bulkUpsert } from "./helpers/mongoDB";
+import { BASE_URL, limit, axiosInstance, collNames } from "./config.js";
 import { AnimeDetails } from "./models";
 
 /**
- * @overview Scrapes GoGoAnime's entire anime-list. 
+ * @overview This file scrapes GoGoAnime's entire anime-list and is intended to be executed locally. 
  * Duration depends on concurrency limit set in "./config.js".
- * Intended to run locally.
  */
+
+let totalProcessed = 0;
+let batchNo = 1;
+
+/**
+ * The initialization function.
+ */
+const scrapeAnimeList = async () => {
+  const startTime = performance.now();
+  console.log("Starting full anime-list scrape...");
+
+  await scrapePage(async (batch: AnimeDetails[]) => {
+    console.log("\nBatch size reached, processing...");
+
+    await bulkUpsert(batch, "animeId", collNames.animeDetails);
+
+    logBatch(batch);
+  }, 500);
+
+  const endTime = performance.now();
+  console.log(`\nScrape completed. Duration (hh:mm:ss): ${formatTimestamp(endTime - startTime)}`);
+};
 
 /**
  * Recursively scrapes all anime list pages for all anime details. 
@@ -69,3 +91,24 @@ export const scrapePage = async <T>(
     return [];
   }
 };
+
+const logBatch = (batch: AnimeDetails[]) => {
+  console.log(
+    `\nBatch ${batchNo++} processed:`,
+    '\nFirst item:', batch[0],
+    '\nLast item:', batch[batch.length - 1],
+    "\nTotal processed:", totalProcessed += batch.length
+  );
+};
+
+const formatTimestamp = (elapsedMs: number) => {
+  const elapsedS = Math.floor(elapsedMs / 1000);
+
+  const hours = String(Math.floor(elapsedS / 3600)).padStart(2, '0');
+  const minutes = String(Math.floor((elapsedS % 3600) / 60)).padStart(2, '0');
+  const seconds = String(elapsedS % 60).padStart(2, '0');
+
+  return `${hours}:${minutes}:${seconds}`;
+};
+
+scrapeAnimeList();

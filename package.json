@@ -2,9 +2,10 @@
   "name": "mojimesearchscraper",
   "version": "1.0.0",
   "description": "",
-  "main": "src/main.ts",
+  "main": "src/scrapeAnimeList.ts",
   "scripts": {
-    "start": "npx tsx src/main.ts"
+    "scrapeAll": "npx tsx src/scrapeAnimeList.ts",
+    "scrapeRecent": "npx tsx src/scrapeRecentRelease.ts"
   },
   "author": "",
   "license": "ISC",
