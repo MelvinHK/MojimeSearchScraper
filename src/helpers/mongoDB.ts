@@ -72,8 +72,3 @@ export const updateDocument = async <T>(
     throw error;
   }
 };
-
-(async () => {
-  // const a = await updateDocument(collNames.mostRecentEpisodeIds, { languageOption: 1 }, "episodeId", "na-nare-hana-nare-episode-4");
-  // console.log("done updating");
-})();
