@@ -1,3 +1,11 @@
+import { collNames } from "./config";
+
+/**
+ * Valid collection names.
+ * @see {@link collNames}
+ */
+export type CollectionName = (typeof collNames)[keyof typeof collNames];
+
 /**
  * MongoDB document structure for anime details.
  */

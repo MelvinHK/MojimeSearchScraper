@@ -25,6 +25,6 @@ if (!uri) {
 export const mongoClient = new MongoClient(uri);
 export const dbName = "MojimeDB";
 export const collNames = Object.freeze({
-  AnimeDetails: "AnimeDetails",
-  MostRecentEpisodeIds: "MostRecentEpisodeIds"
+  animeDetails: "AnimeDetails",
+  mostRecentEpisodeIds: "MostRecentEpisodeIds"
 });

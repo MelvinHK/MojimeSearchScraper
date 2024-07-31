@@ -37,7 +37,7 @@ const checkAndScrapeRecents = async () => {
     console.log(`Checking language ${languageOption}...`);
     try {
       const [dbEpisodeId, scrapedEpisodeId] = await Promise.all([
-        getDocument(collNames.MostRecentEpisodeIds, { languageOption: languageOption })
+        getDocument(collNames.mostRecentEpisodeIds, { languageOption: languageOption })
           .then(res => res?.episodeId),
         scrapeMostRecentEpId(languageOption)
       ]);
@@ -54,9 +54,9 @@ const checkAndScrapeRecents = async () => {
       console.log(`Found ${recentAnime.length} new episode(s) for language ${languageOption}. Inserting any new anime...`);
 
       const [bulkUpsertResult, _] = await Promise.all([
-        bulkUpsert(recentAnime, "animeId", collNames.AnimeDetails),
+        bulkUpsert(recentAnime, "animeId", collNames.animeDetails),
         updateDocument(
-          collNames.MostRecentEpisodeIds,
+          collNames.mostRecentEpisodeIds,
           { languageOption: languageOption },
           "episodeId",
           scrapedEpisodeId
