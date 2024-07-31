@@ -131,7 +131,7 @@ const scrapeRecents = async (
       .children()
       .map((_index, element) => {
         const episodeUrl = $(element).find("a").attr("href");
-        return getLastUrlSection(episodeUrl); // Will throw TypeError if episodeUrl is undefined.
+        return getLastUrlSection(episodeUrl); // Intentionally throws an error if episodeUrl is undefined.
       })
       .get();
 

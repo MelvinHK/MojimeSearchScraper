@@ -37,7 +37,7 @@ export const scrapePage = async <T>(
         .children()
         .map(async (_index, item) => {
           const animeUrl = $(item).find("a").attr("href");
-          const animeId = getLastUrlSection(animeUrl);
+          const animeId = getLastUrlSection(animeUrl);  // Intentionally throws an error if animeUrl is undefined.
           return await limit(() => fetchAnimeDetails(animeId));
         })
         .get()
