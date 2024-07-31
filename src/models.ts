@@ -1,7 +1,8 @@
 import { collNames } from "./config";
 
 /**
- * Valid collection names.
+ * Valid MongoDB collection names.
+ * 
  * @see {@link collNames}
  */
 export type CollectionName = (typeof collNames)[keyof typeof collNames];
