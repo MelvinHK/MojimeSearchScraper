@@ -13,23 +13,6 @@ jobs:
     - name: Checkout repository
       uses: actions/checkout@v3
 
-    - name: Get the public IP of this runner
-      id: get_gh_runner_ip
-      shell: bash
-      run: |
-        echo "ip_address=$(curl -s https://checkip.amazonaws.com)" >> "$GITHUB_ENV"
-
-    - name: Setup MongoDB Atlas CLI
-      uses: mongodb/atlas-github-action@v0.2.0
-
-    - name: Add runner IP to MongoDB access list
-      shell: bash
-      run: |
-        atlas accessLists create ${{ env.ip_address }} --type ipAddress --projectId ${{ secrets.MONGODB_PROJECT_ID }} --comment "Temporary access for GH Action"
-      env:
-        username: ${{ secrets.ATLAS_PUBLIC_KEY }}
-        password: ${{ secrets.ATLAS_PRIVATE_KEY }}
-
     - name: Set up Node.js
       uses: actions/setup-node@v3
       with:
@@ -42,8 +25,3 @@ jobs:
       run: npm run scrapeRecent
       env:
         MONGODB_URI: ${{ secrets.MONGODB_URI }}
-
-    - name: Remove runner IP from MongoDB access list
-      shell: bash
-      run: |
-        atlas accessLists delete ${{ env.ip_address }} --projectId ${{ secrets.MONGODB_PROJECT_ID }} --force
