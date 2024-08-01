@@ -23,3 +23,5 @@ jobs:
 
     - name: Run scraping script
       run: npm run scrapeRecent
+      env:
+        MONGODB_URI: ${{ secrets.MONGODB_URI }}
