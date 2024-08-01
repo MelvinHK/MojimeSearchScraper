@@ -2,8 +2,7 @@ name: Scrape Recent Releases
 
 on:
   schedule:
-    - cron: '0 * * * *'  # This cron expression schedules the job to run every hour
-  workflow_dispatch:     # Allows manual triggering of the workflow from the GitHub UI
+    - cron: '0 * * * *'  # Every hour
 
 jobs:
   scrape:
