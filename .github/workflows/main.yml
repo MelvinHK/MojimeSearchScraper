@@ -21,14 +21,14 @@ jobs:
 
     - name: Setup MongoDB Atlas CLI
       uses: mongodb/atlas-github-action@v0.2.0
-      with:
-        username: ${{ secrets.ATLAS_PUBLIC_KEY }}
-        password: ${{ secrets.ATLAS_PRIVATE_KEY }}
 
     - name: Add runner IP to MongoDB access list
       shell: bash
       run: |
         atlas accessLists create ${{ env.ip_address }} --type ipAddress --projectId ${{ secrets.MONGODB_PROJECT_ID }} --comment "Temporary access for GH Action"
+      env:
+        username: ${{ secrets.ATLAS_PUBLIC_KEY }}
+        password: ${{ secrets.ATLAS_PRIVATE_KEY }}
 
     - name: Set up Node.js
       uses: actions/setup-node@v3
