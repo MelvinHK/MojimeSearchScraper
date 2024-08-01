@@ -14,7 +14,8 @@ import {
   AJAX_URL,
   limit,
   axiosInstance,
-  collNames
+  collNames,
+  mongoClient
 } from "./config";
 import { AnimeDetails, LanguageOption, LanguageOptions, MostRecentEpisode } from "./models";
 
@@ -74,6 +75,9 @@ const checkAndScrapeRecents = async () => {
       console.log(`Error for language ${languageOption}:`, error);
     }
   }
+
+  console.log("Scrape completed.");
+  mongoClient.close();
 };
 
 /**

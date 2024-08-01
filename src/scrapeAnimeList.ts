@@ -2,7 +2,7 @@ import { load } from "cheerio";
 
 import { fetchAnimeDetails, getLastUrlSection } from "./helpers/scraping";
 import { bulkUpsert } from "./helpers/querying";
-import { BASE_URL, limit, axiosInstance, collNames } from "./config.js";
+import { BASE_URL, limit, axiosInstance, collNames, mongoClient } from "./config.js";
 import { AnimeDetails } from "./models";
 
 /**
@@ -27,6 +27,8 @@ const scrapeAnimeList = async () => {
 
   const endTime = performance.now();
   console.log(`\nScrape completed. Duration (hh:mm:ss): ${formatTimestamp(endTime - startTime)}`);
+
+  mongoClient.close();
 };
 
 /**
