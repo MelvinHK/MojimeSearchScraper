@@ -16,7 +16,7 @@ import {
   axiosInstance,
   collNames
 } from "./config";
-import { AnimeDetails, LanguageOptions, MostRecentEpisode } from "./models";
+import { AnimeDetails, LanguageOption, LanguageOptions, MostRecentEpisode } from "./models";
 
 /**
  * @overview This file scrapes GoGoAnime's recent release pages and is intended to be executed server-side every hour.
@@ -78,13 +78,8 @@ const checkAndScrapeRecents = async () => {
 
 /**
  * Scrapes the most recent episode ID.
- * 
- * @param {number} languageOption
- * @returns {Promise<string>} A promise returning the most recent episode ID.
- * 
- * @see {@link LanguageOptions}
  */
-const scrapeMostRecentEpId = async (languageOption: number): Promise<string> => {
+const scrapeMostRecentEpId = async (languageOption: LanguageOption): Promise<string> => {
   try {
     const recentsPage = await axiosInstance.get(
       `${AJAX_URL}/page-recent-release.html?page=1&type=${languageOption}`
@@ -113,7 +108,7 @@ const scrapeMostRecentEpId = async (languageOption: number): Promise<string> => 
  */
 const scrapeRecents = async (
   sentinelEpisodeId: string,
-  languageOption: number,
+  languageOption: LanguageOption,
   pageNumber: number = 1,
   pageLimit: number = 5
 ): Promise<AnimeDetails[]> => {

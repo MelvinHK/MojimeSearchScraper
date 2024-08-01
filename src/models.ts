@@ -33,3 +33,4 @@ export const LanguageOptions = Object.freeze({
   englishDub: 2,
   chinese: 3
 });
+export type LanguageOption = (typeof LanguageOptions)[keyof typeof LanguageOptions];
