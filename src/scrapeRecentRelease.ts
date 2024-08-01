@@ -9,7 +9,7 @@ import {
   bulkUpsert,
   getDocument,
   updateDocument
-} from "./helpers/mongoDB";
+} from "./helpers/querying";
 import {
   AJAX_URL,
   limit,

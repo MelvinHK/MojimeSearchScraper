@@ -4,8 +4,8 @@
   "description": "",
   "main": "src/scrapeAnimeList.ts",
   "scripts": {
-    "scrapeAll": "npx tsx src/scrapeAnimeList.ts",
-    "scrapeRecent": "npx tsx src/scrapeRecentRelease.ts"
+    "scrapeAll": "tsx src/scrapeAnimeList.ts",
+    "scrapeRecent": "tsx src/scrapeRecentRelease.ts"
   },
   "author": "",
   "license": "ISC",

@@ -1,7 +1,7 @@
 import { load } from "cheerio";
 
 import { fetchAnimeDetails, getLastUrlSection } from "./helpers/scraping";
-import { bulkUpsert } from "./helpers/mongoDB";
+import { bulkUpsert } from "./helpers/querying";
 import { BASE_URL, limit, axiosInstance, collNames } from "./config.js";
 import { AnimeDetails } from "./models";
 
@@ -9,9 +9,6 @@ import { AnimeDetails } from "./models";
  * @overview This file scrapes GoGoAnime's entire anime-list and is intended to be executed locally. 
  * Duration depends on concurrency limit set in "./config.js".
  */
-
-let totalProcessed = 0;
-let batchNo = 1;
 
 /**
  * The initialization function.
@@ -92,6 +89,8 @@ export const scrapePage = async <T>(
   }
 };
 
+let batchNo = 1;
+let totalProcessed = 0;
 const logBatch = (batch: AnimeDetails[]) => {
   console.log(
     `\nBatch ${batchNo++} processed:`,
