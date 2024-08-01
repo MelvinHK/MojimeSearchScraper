@@ -22,8 +22,8 @@ jobs:
     - name: Setup MongoDB Atlas CLI
       uses: mongodb/atlas-github-action@v0.2.0
       with:
-        public-key: ${{ secrets.ATLAS_PUBLIC_KEY }}
-        private-key: ${{ secrets.ATLAS_PRIVATE_KEY }}
+        username: ${{ secrets.ATLAS_PUBLIC_KEY }}
+        password: ${{ secrets.ATLAS_PRIVATE_KEY }}
 
     - name: Add runner IP to MongoDB access list
       shell: bash
