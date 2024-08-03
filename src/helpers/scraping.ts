@@ -16,13 +16,23 @@ export const fetchAnimeDetails = async (animeId: string): Promise<AnimeDetails> 
       .text()
       .trim();
 
-    const otherNames = $('div.anime_info_body_bg > p.type.other-name')
-      .find('a')
-      .map((_index, element) => {
-        const name = $(element).text().trim();
-        if (name) return name;
-      })
-      .get();
+    const otherNamesElement = $('div.anime_info_body_bg > p.type.other-name')
+      .find('a');
+
+    const otherNames = [title].concat( // Include default title in other-names to assist in search scoring.
+      (otherNamesElement.length === 1) ? ( // Sometimes the anime's other-names are all in one <a> element.
+        $(otherNamesElement[0]).text().replace(/;/g, ",").split(",").map(
+          name => name.trim()
+        )
+      ) : (
+        otherNamesElement.map((_index, element) => {
+          const name = $(element).text().trim();
+          if (name) return name; // Sometimes there are empty <a> elements.
+        }).get()
+      )
+    );
+
+    console.log(otherNames);
 
     const subOrDub = title.includes('(Dub)') ? 'dub' : 'sub';
 
@@ -36,6 +46,8 @@ export const fetchAnimeDetails = async (animeId: string): Promise<AnimeDetails> 
     throw error;
   }
 };
+
+fetchAnimeDetails("oshi-no-ko");
 
 /**
  * Fetches the episode ID's corresponding anime ID.
