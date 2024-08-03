@@ -34,6 +34,8 @@ import { AnimeDetails, LanguageOption, LanguageOptions, MostRecentEpisode } from
  * @see {@link MostRecentEpisode}
  */
 const checkAndScrapeRecents = async () => {
+  let totalNewCount = 0;
+
   for (const languageOption of Object.values(LanguageOptions)) {
     console.log(`Checking language ${languageOption}...`);
     try {
@@ -44,7 +46,7 @@ const checkAndScrapeRecents = async () => {
       ]);
 
       if (dbEpisodeId === scrapedEpisodeId) {
-        console.log(`No new updates found for language ${languageOption}.`);
+        console.log(`No new updates found for language ${languageOption}.\n`);
         continue;
       }
 
@@ -67,16 +69,17 @@ const checkAndScrapeRecents = async () => {
       const newAnimeCount = bulkUpsertResult.insertedCount;
 
       if (newAnimeCount > 0) {
-        console.log(`Inserted ${newAnimeCount} new anime.`);
+        totalNewCount += newAnimeCount;
+        console.log(`Inserted ${newAnimeCount} new anime.\n`);
       } else {
-        console.log(`No new anime were inserted.`);
+        console.log(`No new anime were inserted.\n`);
       }
     } catch (error) {
       console.log(`Error for language ${languageOption}:`, error);
     }
   }
 
-  console.log("Scrape completed.");
+  console.log(`Scrape completed. Added ${totalNewCount} new anime.`);
   mongoClient.close();
 };
 
