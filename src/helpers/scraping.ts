@@ -32,8 +32,6 @@ export const fetchAnimeDetails = async (animeId: string): Promise<AnimeDetails> 
       )
     );
 
-    console.log(otherNames);
-
     const subOrDub = title.includes('(Dub)') ? 'dub' : 'sub';
 
     return {
@@ -46,8 +44,6 @@ export const fetchAnimeDetails = async (animeId: string): Promise<AnimeDetails> 
     throw error;
   }
 };
-
-fetchAnimeDetails("oshi-no-ko");
 
 /**
  * Fetches the episode ID's corresponding anime ID.
